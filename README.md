@@ -33,7 +33,7 @@ One film reel travels through the whole page. Each section has a `data-scene` ke
 
 ### Sound
 
-`src/audio/sound.ts` synthesises every sound with the Web Audio API, so there are no audio files and no licences to track. The sounds are a projector hum with 24 fps clatter, reel ticks while scrolling, hover clicks, a nav tick, a camera shutter when the lightbox opens, and a leader beep. Sound is **off by default** and is switched on with the toggle in the nav (bottom-right on phones). The choice is remembered, but browsers still need one click or key press per visit before audio can play. Under reduced motion the ambient hum and scroll ticks stay off.
+`src/audio/sound.ts` synthesises every sound with the Web Audio API, so there are no audio files and no licences to track. The sounds are a projector hum with 24 fps clatter, reel ticks while scrolling, hover clicks, a nav tick, a camera shutter when the lightbox opens, and a leader beep. Sound is **off by default** and is switched on with the small speaker icon next to the logo. The choice is remembered, but browsers still need one click or key press per visit before audio can play. Under reduced motion the ambient hum and scroll ticks stay off.
 
 ### Re-cropping images from the deck
 

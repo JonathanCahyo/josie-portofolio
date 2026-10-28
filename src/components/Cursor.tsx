@@ -45,7 +45,7 @@ export function Cursor() {
 
   const ring = label ? 84 : hover ? 54 : 34
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-[70]" style={{ opacity: visible ? 1 : 0 }}>
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-[100]" style={{ opacity: visible ? 1 : 0 }}>
       <motion.div className="absolute top-0 left-0" style={{ x: rx, y: ry }}>
         <motion.div
           className="-translate-x-1/2 -translate-y-1/2 rounded-full border border-cream/70"

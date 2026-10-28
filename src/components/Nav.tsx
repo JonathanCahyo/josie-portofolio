@@ -65,7 +65,7 @@ export function Nav() {
             })}
           </ul>
         </nav>
-        <div className="hidden items-center gap-5 sm:flex">
+        <div className="pointer-events-auto flex items-center gap-1.5 sm:gap-2">
           <SoundToggle />
           <a
             href="#profile"
@@ -73,16 +73,12 @@ export function Nav() {
               e.preventDefault()
               scrollTo(0)
             }}
-            className="pointer-events-auto"
+            className="hidden sm:block"
             aria-label="Josie's Portofolio — back to top"
           >
             <Logo />
           </a>
         </div>
-      </div>
-      {/* phones: the nav pill fills the top bar, so the toggle sits bottom-right */}
-      <div className="fixed right-4 bottom-4 sm:hidden">
-        <SoundToggle />
       </div>
     </header>
   )
