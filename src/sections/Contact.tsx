@@ -61,7 +61,7 @@ export function Contact() {
       </div>
 
       {/* End credits */}
-      <div data-scene="credits" className="container-page mt-32 grid items-center gap-14 md:mt-44 md:grid-cols-12">
+      <div className="container-page mt-32 grid items-center gap-14 md:mt-44 md:grid-cols-12">
         <div className="md:col-span-5">
           <div className="overflow-hidden rounded-frame border border-white/10">
             <div ref={photo}>

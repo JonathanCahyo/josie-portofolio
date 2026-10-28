@@ -200,7 +200,7 @@ function CaseStudy({ org, index, total }: { org: Organization; index: number; to
 export function CaseStudies() {
   const list = caseStudyOrder.map((id) => organizations.find((o) => o.id === id)!).filter((o) => o.caseStudy)
   return (
-    <div data-nav="gallery" data-scene="cases" aria-label="Organization case studies">
+    <div data-nav="gallery" aria-label="Organization case studies">
       {list.map((org, i) => (
         <CaseStudy key={org.id} org={org} index={i} total={list.length} />
       ))}

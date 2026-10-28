@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { rig } from './rig'
-import { reelWorld } from './Reel'
+import { toolkitAnchor } from './rig'
 import { pointerState, scrollState } from '../animations/scrollState'
 import { statementTexture } from './textures'
 import { toolkit } from '../data/about'
@@ -29,19 +28,19 @@ export function Statement({ reduced }: { reduced: boolean }) {
     const m = mat.current
     if (!g || !m) return
     const delta = Math.min(dt, 1 / 20)
-    m.opacity = THREE.MathUtils.damp(m.opacity, rig.cyl, 4, delta)
+    m.opacity = THREE.MathUtils.damp(m.opacity, toolkitAnchor.vis, 6, delta)
     g.visible = m.opacity > 0.01
     if (!g.visible) return
 
-    const { halfW, halfH } = reelWorld
+    const { halfW, halfH } = toolkitAnchor
     // radius so the visible arc spans ~95% of the viewport width; height follows the
     // texture's aspect (with the deck's tall stretch) so portrait screens don't distort it
     const R = (halfW * 2 * 0.95) / (2 * Math.sin(ARC / 2))
     const H = Math.min(halfH * 2 * 0.72, ((R * ARC) / TEXTURE_ASPECT) * 1.7)
     g.scale.set(R, H, R)
-    g.position.set(0, reelWorld.y * 0.25, -R - 0.9)
+    g.position.set(0, toolkitAnchor.y, -R - 0.9)
     const sway = reduced ? 0 : pointerState.x * 0.08 + THREE.MathUtils.clamp(scrollState.velocity, -40, 40) * 0.002
-    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, sway + (1 - rig.cyl) * 0.6, 3, delta)
+    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, sway + (1 - toolkitAnchor.vis) * 0.6, 3, delta)
   })
 
   return (

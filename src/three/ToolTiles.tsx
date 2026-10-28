@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
-import { rig } from './rig'
-import { reelWorld } from './Reel'
+import { toolkitAnchor } from './rig'
 import { pointerState } from '../animations/scrollState'
 import { PALETTE, tileTexture } from './textures'
 import { toolkit } from '../data/about'
@@ -23,11 +22,11 @@ export function ToolTiles({ quality, reduced }: { quality: Quality; reduced: boo
     if (!g) return
     const delta = Math.min(dt, 1 / 20)
     if (!reduced) time.current += delta
-    const vis = rig.tiles
+    const vis = toolkitAnchor.vis
     g.visible = vis > 0.01
     if (!g.visible) return
 
-    const { x, y, r, halfW, halfH } = reelWorld
+    const { x, y, r, halfW, halfH } = toolkitAnchor
     const rx = Math.min(r * 2.3, halfW * 0.82)
     const ry = Math.min(r * 1.45, halfH * 0.75)
     const size = Math.min(halfW, halfH) * 0.26

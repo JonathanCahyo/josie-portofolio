@@ -59,13 +59,6 @@ export function Hero({ introDone }: { introDone: boolean }) {
       gsap.from('.hero-letter', { yPercent: 110, duration: 1.3, stagger: 0.05, ease: 'reveal' })
       gsap.from('.hero-script', { autoAlpha: 0, x: -30, duration: 1.4, delay: 0.35, ease: 'reveal' })
       gsap.from('.hero-fade', { autoAlpha: 0, y: 24, duration: 1, delay: 0.8, stagger: 0.1, ease: 'reveal' })
-      // the wordmark drifts up and softens as the page scrolls away
-      gsap.to(mark.current, {
-        yPercent: -18,
-        autoAlpha: 0.15,
-        ease: 'none',
-        scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true },
-      })
     }, root)
     return () => ctx.revert()
   }, [introDone, reduced])

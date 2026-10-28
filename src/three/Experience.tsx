@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Environment, Lightformer, PerformanceMonitor } from '@react-three/drei'
 import * as THREE from 'three'
@@ -7,21 +7,42 @@ import { FilmRibbon } from './FilmRibbon'
 import { Statement } from './Statement'
 import { ToolTiles } from './ToolTiles'
 import { Dust } from './Dust'
-import { rig } from './rig'
+import { STAGES } from './rig'
 import { detectQuality } from './quality'
 import { pointerState } from '../animations/scrollState'
+import { gsap } from '../animations/gsap'
 
-function CameraRig({ reduced }: { reduced: boolean }) {
-  const { camera } = useThree()
+/**
+ * Renders in the same tick as Lenis/ScrollTrigger (GSAP's ticker), after the
+ * scroll position is updated, so section-anchored objects never lag the page
+ * by a frame. Under reduced motion it renders only when the page scrolls.
+ */
+function Driver({ reduced }: { reduced: boolean }) {
+  const advance = useThree((s) => s.advance)
+  useEffect(() => {
+    const render = () => advance(performance.now())
+    if (!reduced) {
+      gsap.ticker.add(render)
+      return () => gsap.ticker.remove(render)
+    }
+    render()
+    window.addEventListener('scroll', render, { passive: true })
+    window.addEventListener('resize', render)
+    return () => {
+      window.removeEventListener('scroll', render)
+      window.removeEventListener('resize', render)
+    }
+  }, [advance, reduced])
+  return null
+}
+
+/** The camera stays put (objects are locked to the page); a warm key light follows the pointer. */
+function PointerLight({ reduced }: { reduced: boolean }) {
   const light = useRef<THREE.PointLight>(null)
   useFrame((_, dt) => {
     const delta = Math.min(dt, 1 / 20)
     const px = reduced ? 0 : pointerState.x
     const py = reduced ? 0 : pointerState.y
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, px * 0.35, 2.5, delta)
-    camera.position.y = THREE.MathUtils.damp(camera.position.y, py * 0.22, 2.5, delta)
-    camera.position.z = THREE.MathUtils.damp(camera.position.z, 10 + rig.cam * 1.4, 2.5, delta)
-    camera.lookAt(0, 0, 0)
     if (light.current) {
       // A warm key light that follows the pointer — the scene "relights" as you move.
       light.current.position.x = THREE.MathUtils.damp(light.current.position.x, px * 6, 3, delta)
@@ -46,16 +67,16 @@ export default function Experience({ reduced, onReady }: { reduced: boolean; onR
   const maxDpr = quality === 'high' ? 1.75 : 1.5
   const [dpr, setDpr] = useState(maxDpr)
 
-  // Under reduced motion the scene is a still: render on demand only.
   return (
     <Canvas
       className="!fixed inset-0 !h-[100lvh] !w-screen"
       style={{ pointerEvents: 'none' }}
       dpr={[1, dpr]}
-      frameloop={reduced ? 'demand' : 'always'}
+      frameloop="never"
       camera={{ fov: 35, position: [0, 0, 10], near: 0.1, far: 60 }}
       gl={{ antialias: quality === 'high', alpha: true, powerPreference: 'high-performance' }}
       onCreated={({ gl }) => {
+        gl.localClippingEnabled = true
         gl.toneMapping = THREE.ACESFilmicToneMapping
         gl.toneMappingExposure = 1.05
         gl.setClearColor(0x000000, 0)
@@ -76,10 +97,14 @@ export default function Experience({ reduced, onReady }: { reduced: boolean; onR
         <Lightformer form="ring" intensity={1.5} color="#ffd9cf" position={[2, 2, 6]} scale={3} />
       </Environment>
 
-      <CameraRig reduced={reduced} />
-      <FilmRibbon quality={quality} reduced={reduced} />
+      <Driver reduced={reduced} />
+      <PointerLight reduced={reduced} />
+      <FilmRibbon stage="hero" opacity={0.92} quality={quality} reduced={reduced} />
+      <FilmRibbon stage="contact" opacity={0.7} quality={quality} reduced={reduced} />
       <Statement reduced={reduced} />
-      <Reel quality={quality} reduced={reduced} />
+      {STAGES.map((stage) => (
+        <Reel key={stage.key} stage={stage} quality={quality} reduced={reduced} />
+      ))}
       <ToolTiles quality={quality} reduced={reduced} />
       <Dust count={quality === 'high' ? 520 : 180} reduced={reduced} />
       <FirstFrame onReady={onReady} />

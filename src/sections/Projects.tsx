@@ -220,7 +220,7 @@ export function Projects() {
         </div>
       </section>
 
-      <section ref={stage} data-nav="gallery" data-scene="chapters" aria-label="Projects" className="relative lg:h-[100svh] lg:overflow-hidden">
+      <section ref={stage} data-nav="gallery" aria-label="Projects" className="relative lg:h-[100svh] lg:overflow-hidden">
         <div ref={track} className="flex flex-col lg:h-full lg:w-max lg:flex-row">
           {projects.map((p, i) => (
             <ProjectPanel key={p.id} project={p} index={i} />

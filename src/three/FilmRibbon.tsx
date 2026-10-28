@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import { rig } from './rig'
+import { stageElement, type StageKey } from './rig'
 import { pointerState, scrollState } from '../animations/scrollState'
 import type { Quality } from './quality'
 
@@ -70,8 +70,23 @@ const fragment = /* glsl */ `
   }
 `
 
-export function FilmRibbon({ quality, reduced }: { quality: Quality; reduced: boolean }) {
+const DEPTH = -2.4 // matches the z offset baked into curve()
+
+/** A film strip winding behind one section; it scrolls with that section like the reel. */
+export function FilmRibbon({
+  stage,
+  opacity,
+  quality,
+  reduced,
+}: {
+  stage: StageKey
+  opacity: number
+  quality: Quality
+  reduced: boolean
+}) {
+  const mesh = useRef<THREE.Mesh>(null)
   const mat = useRef<THREE.ShaderMaterial>(null)
+  const tmp = useMemo(() => new THREE.Vector3(), [])
   const { viewport } = useThree()
   const segments = quality === 'high' ? 420 : 160
   const length = Math.max(14, viewport.width * 1.7)
@@ -84,7 +99,7 @@ export function FilmRibbon({ quality, reduced }: { quality: Quality; reduced: bo
       uTime: { value: 0 },
       uScroll: { value: 0 },
       uLength: { value: length },
-      uAmp: { value: 1.6 },
+      uAmp: { value: 1.3 },
       uWave: { value: 0 },
       uOpacity: { value: 0 },
       uHoles: { value: 64 },
@@ -96,9 +111,17 @@ export function FilmRibbon({ quality, reduced }: { quality: Quality; reduced: bo
     [],
   )
 
-  useFrame((_, dt) => {
+  useFrame((state, dt) => {
     const m = mat.current
-    if (!m) return
+    const el = stageElement(stage)
+    if (!m || !mesh.current || !el) return
+    const vh = state.size.height
+    const rect = el.getBoundingClientRect()
+    mesh.current.visible = rect.bottom > 0 && rect.top < vh
+    if (!mesh.current.visible) return
+    // follow the section: its first screen's centre is the ribbon's centre
+    const halfHz = state.viewport.getCurrentViewport(state.camera, tmp.set(0, 0, DEPTH)).height / 2
+    mesh.current.position.y = (-rect.top / vh) * 2 * halfHz
     const u = m.uniforms
     const delta = Math.min(dt, 1 / 20)
     if (!reduced) u.uTime.value += delta
@@ -108,11 +131,11 @@ export function FilmRibbon({ quality, reduced }: { quality: Quality; reduced: bo
     pointerState.speed = THREE.MathUtils.damp(pointerState.speed, 0, 2.5, delta)
     const wave = reduced ? 0 : pointerState.speed * 2.5 + Math.min(1, Math.abs(scrollState.velocity) / 30)
     u.uWave.value = THREE.MathUtils.damp(u.uWave.value, wave, 3, delta)
-    u.uOpacity.value = THREE.MathUtils.damp(u.uOpacity.value, rig.ribbon * 0.92, 3, delta)
+    u.uOpacity.value = THREE.MathUtils.damp(u.uOpacity.value, opacity, 3, delta)
   })
 
   return (
-    <mesh geometry={geometry} frustumCulled={false} renderOrder={-1}>
+    <mesh ref={mesh} geometry={geometry} frustumCulled={false} renderOrder={-1} visible={false}>
       <shaderMaterial
         ref={mat}
         vertexShader={vertex}

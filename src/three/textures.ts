@@ -56,6 +56,29 @@ export function reelFaceTexture(size = 1024) {
   return toTexture(c, 8)
 }
 
+/** Wound film seen through the reel's windows: dark concentric layers with a soft sheen. */
+export function filmPackTexture(size = 512) {
+  const { c, ctx } = canvas(size, size)
+  const r = size / 2
+  ctx.fillStyle = PALETTE.bg
+  ctx.fillRect(0, 0, size, size)
+  for (let i = 0; i < 70; i++) {
+    const rr = r * (0.12 + (i / 70) * 0.88)
+    ctx.strokeStyle = i % 3 === 0 ? 'rgba(240,230,220,0.08)' : 'rgba(0,0,0,0.35)'
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.arc(r, r, rr, 0, Math.PI * 2)
+    ctx.stroke()
+  }
+  const sheen = ctx.createLinearGradient(0, 0, size, size)
+  sheen.addColorStop(0.3, 'rgba(255,220,210,0)')
+  sheen.addColorStop(0.5, 'rgba(255,220,210,0.12)')
+  sheen.addColorStop(0.7, 'rgba(255,220,210,0)')
+  ctx.fillStyle = sheen
+  ctx.fillRect(0, 0, size, size)
+  return toTexture(c)
+}
+
 /**
  * Text set along the reel's outer band. `full` repeats the label around the
  * whole circle (hero); otherwise it is centred on the top arc like the deck.

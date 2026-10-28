@@ -1,10 +1,8 @@
 import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
 import { SmoothScroll } from './animations/SmoothScroll'
-import { useSceneScroll } from './animations/useSceneScroll'
 import { ScrollTrigger } from './animations/gsap'
 import { useReducedMotion } from './hooks/useMedia'
 import { SceneContext } from './three/SceneContext'
-import { resetRig } from './three/rig'
 import { Nav } from './components/Nav'
 import { Cursor } from './components/Cursor'
 import { Loader } from './components/Loader'
@@ -45,7 +43,6 @@ class SceneBoundary extends Component<{ onError: () => void; children: ReactNode
 }
 
 function Page({ introDone }: { introDone: boolean }) {
-  useSceneScroll(true)
   return (
     <main id="main">
       <Hero introDone={introDone} />
@@ -65,10 +62,8 @@ export default function App() {
   const [sceneReady, setSceneReady] = useState(false)
   const [sceneFailed, setSceneFailed] = useState(() => !webglAvailable())
   const [introDone, setIntroDone] = useState(false)
-  const [heroInView, setHeroInView] = useState(true)
 
   useEffect(() => {
-    resetRig()
     Promise.all([document.fonts.ready, ...CANVAS_FONTS.map((f) => document.fonts.load(f))])
       .catch(() => undefined)
       .finally(() => setFontsReady(true))
@@ -81,16 +76,6 @@ export default function App() {
   useEffect(() => {
     if (fontsReady) ScrollTrigger.refresh()
   }, [fontsReady])
-
-  // Under reduced motion the 3D is a still backdrop for the hero only.
-  useEffect(() => {
-    if (!reduced) return
-    const hero = document.getElementById('profile')
-    if (!hero) return
-    const io = new IntersectionObserver(([e]) => setHeroInView(e.isIntersecting), { threshold: 0.15 })
-    io.observe(hero)
-    return () => io.disconnect()
-  }, [reduced])
 
   const showScene = fontsReady && !sceneFailed
   const ready = fontsReady && (sceneReady || sceneFailed)
@@ -109,8 +94,7 @@ export default function App() {
 
           <div
             aria-hidden
-            className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[100lvh] transition-opacity duration-700"
-            style={{ opacity: !reduced || heroInView ? 1 : 0 }}
+            className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[100lvh]"
           >
             {showScene && (
               <SceneBoundary onError={() => setSceneFailed(true)}>
