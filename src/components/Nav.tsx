@@ -5,6 +5,8 @@ import { ScrollTrigger } from '../animations/gsap'
 import { useSmoothScroll } from '../animations/SmoothScroll'
 import { SPRING } from '../animations/easing'
 import { Logo } from './Logo'
+import { SoundToggle } from './SoundToggle'
+import { sound } from '../audio/sound'
 
 /** Deck-style pill nav: the active item sits in a darker inset pill that slides between items. */
 export function Nav() {
@@ -48,6 +50,7 @@ export function Nav() {
                     aria-current={isActive ? 'true' : undefined}
                     onClick={(e) => {
                       e.preventDefault()
+                      sound.click()
                       scrollTo(`#${item.id}`)
                       history.replaceState(null, '', `#${item.id}`)
                     }}
@@ -62,17 +65,24 @@ export function Nav() {
             })}
           </ul>
         </nav>
-        <a
-          href="#profile"
-          onClick={(e) => {
-            e.preventDefault()
-            scrollTo(0)
-          }}
-          className="pointer-events-auto hidden sm:block"
-          aria-label="Josie's Portofolio — back to top"
-        >
-          <Logo />
-        </a>
+        <div className="hidden items-center gap-5 sm:flex">
+          <SoundToggle />
+          <a
+            href="#profile"
+            onClick={(e) => {
+              e.preventDefault()
+              scrollTo(0)
+            }}
+            className="pointer-events-auto"
+            aria-label="Josie's Portofolio — back to top"
+          >
+            <Logo />
+          </a>
+        </div>
+      </div>
+      {/* phones: the nav pill fills the top bar, so the toggle sits bottom-right */}
+      <div className="fixed right-4 bottom-4 sm:hidden">
+        <SoundToggle />
       </div>
     </header>
   )

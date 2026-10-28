@@ -4,6 +4,7 @@ import type { Img } from '../data/types'
 import { Media } from './Media'
 import { useSmoothScroll } from '../animations/SmoothScroll'
 import { BEZIER } from '../animations/easing'
+import { sound } from '../audio/sound'
 
 type Item = Img & { caption?: string }
 const Ctx = createContext<(item: Item) => void>(() => {})
@@ -20,6 +21,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
     (next: Item) => {
       opener.current = document.activeElement as HTMLElement | null
       setItem(next)
+      sound.shutter()
       lenis()?.stop()
     },
     [lenis],

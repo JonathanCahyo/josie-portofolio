@@ -1,5 +1,6 @@
 import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
 import { SmoothScroll } from './animations/SmoothScroll'
+import { initSound } from './audio/sound'
 import { ScrollTrigger } from './animations/gsap'
 import { useReducedMotion } from './hooks/useMedia'
 import { SceneContext } from './three/SceneContext'
@@ -71,6 +72,8 @@ export default function App() {
     const t = setTimeout(() => setSceneReady(true), 6000)
     return () => clearTimeout(t)
   }, [])
+
+  useEffect(() => initSound(), [])
 
   // Pins and trigger positions depend on final font metrics.
   useEffect(() => {
