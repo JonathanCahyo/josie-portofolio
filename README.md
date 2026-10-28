@@ -46,7 +46,7 @@ npm run assets
 
 1. The repository name must match `REPO_NAME` in `vite.config.ts` (currently `josie-portofolio`).
 2. On GitHub, go to **Settings → Pages → Source** and select **GitHub Actions**.
-3. The live site is `https://<username>.github.io/josie-portofolio/`.
+3. The live site is https://jonathancahyo.github.io/josie-portofolio/
 
 ## Content placeholders
 
@@ -60,4 +60,4 @@ Missing items render as a dashed "Link soon" chip. To fill one in, set the `href
 | IDN Times article URL | `src/data/projects.ts` (idn → `links`) |
 | Menembus Keruh video URL | `src/data/projects.ts` (keruh → `links`) |
 | Description/role for Starlight UMN & Flagship 4.0 | `src/data/organizations.ts` (add `caseStudy`) |
-| Absolute `og:image` / `og:url` once the live URL is known | `index.html` |
+
